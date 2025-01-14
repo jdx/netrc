@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -67,7 +66,6 @@ func ParseString(contents string) (*Netrc, error) {
 func (n *Netrc) Machines() Machines {
 	return n.machines
 }
-
 
 // Machine gets a machine by name
 func (n *Netrc) Machine(name string) *Machine {
@@ -135,7 +133,7 @@ func (n *Netrc) Save() error {
 			return err
 		}
 	}
-	return ioutil.WriteFile(n.Path, body, 0600)
+	return os.WriteFile(n.Path, body, 0600)
 }
 
 func read(path string) (io.Reader, error) {

@@ -2,7 +2,6 @@ package netrc_test
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -24,7 +23,7 @@ func (s *NetrcSuite) TestLogin(c *C) {
 	heroku := f.Machine("api.heroku.com")
 	c.Check(heroku.Get("login"), Equals, "jeff@heroku.com")
 	c.Check(heroku.Get("password"), Equals, "foo")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -34,8 +33,8 @@ func (s *NetrcSuite) TestSave(c *C) {
 	f.Path = "./examples/login-new.netrc"
 	err = f.Save()
 	c.Assert(err, IsNil)
-	a, _ := ioutil.ReadFile("./examples/login-new.netrc")
-	b, _ := ioutil.ReadFile("./examples/login.netrc")
+	a, _ := os.ReadFile("./examples/login-new.netrc")
+	b, _ := os.ReadFile("./examples/login.netrc")
 	c.Check(string(a), Equals, string(b))
 	os.Remove("./examples/login-new.netrc")
 }
@@ -84,7 +83,7 @@ func (s *NetrcSuite) TestSampleMulti(c *C) {
 	c.Check(f.Machine("m").Get("password"), Equals, "pm")
 	c.Check(f.Machine("n").Get("login"), Equals, "ln")
 	c.Check(f.Machine("n").Get("password"), Equals, "pn")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -95,7 +94,7 @@ func (s *NetrcSuite) TestSampleMultiWithDefault(c *C) {
 	c.Check(f.Machine("m").Get("password"), Equals, "pm")
 	c.Check(f.Machine("n").Get("login"), Equals, "ln")
 	c.Check(f.Machine("n").Get("password"), Equals, "pn")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -104,7 +103,7 @@ func (s *NetrcSuite) TestNewlineless(c *C) {
 	c.Assert(err, IsNil)
 	c.Check(f.Machine("m").Get("login"), Equals, "l")
 	c.Check(f.Machine("m").Get("password"), Equals, "p")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -115,7 +114,7 @@ func (s *NetrcSuite) TestBadDefaultOrder(c *C) {
 	c.Check(f.Machine("mail.google.com").Get("password"), Equals, "somethingSecret")
 	c.Check(f.Machine("ray").Get("login"), Equals, "demo")
 	c.Check(f.Machine("ray").Get("password"), Equals, "mypassword")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -124,7 +123,7 @@ func (s *NetrcSuite) TestDefaultOnly(c *C) {
 	c.Assert(err, IsNil)
 	c.Check(f.Machine("default").Get("login"), Equals, "ld")
 	c.Check(f.Machine("default").Get("password"), Equals, "pd")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -134,7 +133,7 @@ func (s *NetrcSuite) TestGood(c *C) {
 	c.Check(f.Machine("mail.google.com").Get("login"), Equals, "joe@gmail.com")
 	c.Check(f.Machine("mail.google.com").Get("account"), Equals, "justagmail")
 	c.Check(f.Machine("mail.google.com").Get("password"), Equals, "somethingSecret")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -142,7 +141,7 @@ func (s *NetrcSuite) TestPassword(c *C) {
 	f, err := netrc.Parse("./examples/password.netrc")
 	c.Assert(err, IsNil)
 	c.Check(f.Machine("m").Get("password"), Equals, "p")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -151,7 +150,7 @@ func (s *NetrcSuite) TestGetOctothorpe(c *C) {
 	c.Assert(err, IsNil)
 	c.Check(f.Machine("hash").Get("password"), Equals, "foo#bar$baz%boom")
 	c.Check(f.Machine("hash2").Get("password"), Equals, "foo#bar$baz%boom##")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
@@ -160,12 +159,13 @@ func (s *NetrcSuite) TestPermissive(c *C) {
 	c.Assert(err, IsNil)
 	c.Check(f.Machine("m").Get("login"), Equals, "l")
 	c.Check(f.Machine("m").Get("password"), Equals, "p")
-	body, _ := ioutil.ReadFile(f.Path)
+	body, _ := os.ReadFile(f.Path)
 	c.Check(f.Render(), Equals, string(body))
 }
 
 func (s *NetrcSuite) TestParseString(c *C) {
 	file, err := os.Open("./examples/good.netrc")
+	c.Assert(err, IsNil)
 	defer file.Close()
 	data, err := io.ReadAll(file)
 	c.Assert(err, IsNil)
